@@ -11,9 +11,17 @@ function App() {
 
   useEffect(() => {
     console.log(11111111111111);
+
+    const config = {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-type": "application/json",
+      },
+    };
+
     axios
       .post("https://thebetter.bsgroup.eu/Authorization/SignIn", {
-        // header: "Content-Type: application/json",
+        ...config,
         data: {},
       })
       .then((res: any) => {
@@ -46,40 +54,24 @@ function App() {
 
     const config = {
       headers: {
-        // "Content-type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Content-type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     };
     // axios.defaults.headers.common["Authorization"] = token;
-    console.log(1, axios.defaults.headers);
+    // console.log(1, axios.defaults.headers);
 
     axios
       .post("https://thebetter.bsgroup.eu/Media/GetMediaList", {
         ...config,
         data: {
-          PageSize: 1,
-          PageNumber: 0,
-          FullTextSearch: "string",
-          IncludeCount: true,
-          MediaListId: 0,
-          IncludeCategories: true,
-          IncludeMedia: true,
+          MediaListId: 2,
+          IncludeCategories: false,
           IncludeImages: true,
-          Categories: [0],
-          MediaOptions: {
-            PageSize: 0,
-            PageNumber: 0,
-            FullTextSearch: "string",
-            IncludeCount: true,
-            ParentMediaId: 0,
-            IncludeCategories: true,
-            IncludeImages: true,
-            Categories: [0],
-            // DateFrom: "2021-08-02T12:17:42.330Z",
-            DayTime: "ALL_DAY",
-            AvailableNow: true,
-            OngoingNow: true,
-          },
+          IncludeMedia: false,
+          PageNumber: 1,
+          PageSize: 15,
         },
       })
       .then((res: any) => {
