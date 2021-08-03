@@ -1,52 +1,50 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { CssBaseline } from "@material-ui/core";
 import Container from "./components/Container";
 import SplashScreen from "./components/SplashScreen";
-import axios from "axios";
-import jwt_decode from "jwt-decode";
+import { AuthData, login } from "./utils/utils";
+import mediaListFakeApi from "./data/mediaList.json";
+import Home from "./components/Home";
+import axios, { AxiosResponse, AxiosError } from "axios";
+
+const SIGN_IN_ENDPOINT = "https://thebetter.bsgroup.eu/Authorization/SignIn";
 
 function App() {
-  const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loginFailMassage, setLoginFailMassage] = useState("");
+
   const [res, setRes] = useState({});
+  const [videos, setVideos] = useState({});
+  const tokenRef = useRef<string | null>(null);
+
+  const [mediaList, setMediaList] = useState(mediaListFakeApi);
 
   useEffect(() => {
-    console.log(11111111111111);
-
-    const config = {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-type": "application/json",
-      },
-    };
-
     axios
-      .post("https://thebetter.bsgroup.eu/Authorization/SignIn", {
-        ...config,
+      .post(SIGN_IN_ENDPOINT, {
+        headers: {
+          "Content-type": "application/json",
+        },
         data: {},
       })
-      .then((res: any) => {
-        setRes(res);
-        // console.log(res);
-
+      .then((res) => {
         const { Token } = res.data.AuthorizationToken;
-        // console.log(Token);
-
-        localStorage.setItem("token", Token);
-        console.log("AUTH DONE");
-        // const decoded = jwt_decode(Token);
-        // console.log(decoded);
+        tokenRef.current = Token;
+        setIsLoggedIn(true);
+        setLoginFailMassage("");
       })
-      .catch((err) => setRes(err))
-      .finally(() => {});
+      .catch((err) => {
+        setIsLoggedIn(false);
+        setLoginFailMassage(err.message);
+      });
   }, []);
 
-  useEffect(() => {
-    const timeout: ReturnType<typeof setTimeout> = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+  //   const timeout: ReturnType<typeof setTimeout> = setTimeout(() => {
+  //     setIsLoggedIn(false);
+  //   }, 1000);
 
-    return () => clearTimeout(timeout);
-  }, []);
+  //   return () => clearTimeout(timeout);
+  // }, []);
 
   const getMediaList = () => {
     const token = localStorage.getItem("token");
@@ -78,26 +76,35 @@ function App() {
         console.log(res);
         console.log("getMediaList DONE SUCCESS");
       })
-      .catch((err) => console.log(err))
-      .finally(() => {});
+      .catch((err) => {
+        console.log(err);
+        // setRes(err);
+      });
   };
 
   return (
     <>
       <CssBaseline />
-      {localStorage.getItem("token")}
+      {/* {localStorage.getItem("token")}
       <div>
         <button onClick={getMediaList}>getMedia</button>
       </div>
 
-      <pre>{JSON.stringify(res, null, 2)}</pre>
-      {/* {loading ? (
-        <SplashScreen />
-      ) : (
+      <pre>{JSON.stringify(res, null, 2)}</pre> */}
+      {isLoggedIn ? (
         <Container>
-          <>to jest screen</>
+          <>
+            <Home mediaList={mediaList} />
+            {/* tokenRef.current = <br /> <br />
+            {tokenRef.current}
+            <br />
+            <br />
+            <pre>{JSON.stringify(videos, null, 2)}</pre> */}
+          </>
         </Container>
-      )} */}
+      ) : (
+        <SplashScreen loginFailMassage={loginFailMassage} />
+      )}
     </>
   );
 }
