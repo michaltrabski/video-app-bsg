@@ -7,7 +7,7 @@ import Home, { MediaListObj } from "./components/Home";
 import axios from "axios";
 
 const ENDPOINT = "https://thebetter.bsgroup.eu/";
-const SIGN_IN_ENDPOINT = ENDPOINT + "Authorization/SignInC";
+const SIGN_IN_ENDPOINT = ENDPOINT + "Authorization/SignIn";
 const GET_MEDIA_LIST_ENDPOINT = ENDPOINT + "Media/GetMediaList";
 
 function App() {
