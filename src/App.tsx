@@ -2,10 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { CssBaseline } from "@material-ui/core";
 import Container from "./components/Container";
 import SplashScreen from "./components/SplashScreen";
-import { AuthData, login } from "./utils/utils";
 import mediaListFakeApi from "./data/mediaList.json";
-import Home from "./components/Home";
-import axios, { AxiosResponse, AxiosError } from "axios";
+import Home, { MediaListObj } from "./components/Home";
+import axios from "axios";
 
 const ENDPOINT = "https://thebetter.bsgroup.eu/";
 const SIGN_IN_ENDPOINT = ENDPOINT + "Authorization/SignIn";
@@ -16,7 +15,7 @@ function App() {
   const [loginFailMassage, setLoginFailMassage] = useState("");
 
   const tokenRef = useRef<string | null>(null);
-  const [mediaList, setMediaList] = useState(mediaListFakeApi);
+  const [mediaList, setMediaList] = useState<MediaListObj | null>(null);
 
   // authentication
   useEffect(() => {
@@ -53,7 +52,7 @@ function App() {
     if (!tokenRef.current) return;
 
     axios
-      .post(GET_MEDIA_LIST_ENDPOINT, {
+      .post<MediaListObj>(GET_MEDIA_LIST_ENDPOINT, {
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Content-type": "application/json",
@@ -84,9 +83,7 @@ function App() {
       <CssBaseline />
 
       {isLoggedIn ? (
-        <Container>
-          <Home mediaList={mediaList} />
-        </Container>
+        <Container>{mediaList && <Home mediaList={mediaList} />}</Container>
       ) : (
         <SplashScreen loginFailMassage={loginFailMassage} />
       )}
