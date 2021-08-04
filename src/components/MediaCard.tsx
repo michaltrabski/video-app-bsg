@@ -21,9 +21,9 @@ interface Props {
 }
 export default function MediaCard(props: Props) {
   return (
-    <Card sx={{ maxWidth: 345, mb: 2 }}>
+    <Card sx={{ mb: 2 }}>
       <CardMedia
-        sx={{ height: 140 }}
+        sx={{ height: 300 }}
         image={props.images[0].Url}
         title={props.title}
       />
@@ -31,15 +31,10 @@ export default function MediaCard(props: Props) {
         <Typography gutterBottom variant="h5" component="div">
           {props.title}
         </Typography>
-        {/* <Typography variant="body2" color="text.secondary">
-          Lizards are a widespread group of squamate reptiles, with over 6,000
-          species, ranging across all continents except Antarctica
-        </Typography> */}
       </CardContent>
-      {/* <CardActions>
-        <Button size="small">Share</Button>
-        <Button size="small">Learn More</Button>
-      </CardActions> */}
+      <CardActions>
+        <Button size="small">Play Video</Button>
+      </CardActions>
     </Card>
   );
 }

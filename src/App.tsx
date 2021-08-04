@@ -7,19 +7,20 @@ import mediaListFakeApi from "./data/mediaList.json";
 import Home from "./components/Home";
 import axios, { AxiosResponse, AxiosError } from "axios";
 
-const SIGN_IN_ENDPOINT = "https://thebetter.bsgroup.eu/Authorization/SignIn";
+const ENDPOINT = "https://thebetter.bsgroup.eu/";
+const SIGN_IN_ENDPOINT = ENDPOINT + "Authorization/SignIn";
+const GET_MEDIA_LIST_ENDPOINT = ENDPOINT + "Media/GetMediaList";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginFailMassage, setLoginFailMassage] = useState("");
 
-  const [res, setRes] = useState({});
-  const [videos, setVideos] = useState({});
   const tokenRef = useRef<string | null>(null);
-
   const [mediaList, setMediaList] = useState(mediaListFakeApi);
 
+  // authentication
   useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
     axios
       .post(SIGN_IN_ENDPOINT, {
         headers: {
@@ -36,33 +37,28 @@ function App() {
       .catch((err) => {
         setIsLoggedIn(false);
         setLoginFailMassage(err.message);
+
+        // since loggin on production doens not work due to cors policy I will diplay my mediaListFakeApi
+        timeout = setTimeout(() => {
+          setIsLoggedIn(true);
+          setLoginFailMassage("");
+        }, 2000);
       });
+
+    return () => clearTimeout(timeout);
   }, []);
 
-  //   const timeout: ReturnType<typeof setTimeout> = setTimeout(() => {
-  //     setIsLoggedIn(false);
-  //   }, 1000);
-
-  //   return () => clearTimeout(timeout);
-  // }, []);
-
-  const getMediaList = () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    const config = {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    // axios.defaults.headers.common["Authorization"] = token;
-    // console.log(1, axios.defaults.headers);
+  // getMediaList
+  useEffect(() => {
+    if (!tokenRef.current) return;
 
     axios
-      .post("https://thebetter.bsgroup.eu/Media/GetMediaList", {
-        ...config,
+      .post(GET_MEDIA_LIST_ENDPOINT, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-type": "application/json",
+          Authorization: `Bearer ${tokenRef.current}`,
+        },
         data: {
           MediaListId: 2,
           IncludeCategories: false,
@@ -72,35 +68,24 @@ function App() {
           PageSize: 15,
         },
       })
-      .then((res: any) => {
-        console.log(res);
-        console.log("getMediaList DONE SUCCESS");
+      .then((res) => {
+        setMediaList(res.data);
       })
       .catch((err) => {
+        // I always get 401 - that is why I use madiaListFakeAPi to go further with task
+        // There was no problem with request in postman and this is where I get data to hartcode in data/mediaList.json
         console.log(err);
-        // setRes(err);
+        setMediaList(mediaListFakeApi);
       });
-  };
+  }, [isLoggedIn]);
 
   return (
     <>
       <CssBaseline />
-      {/* {localStorage.getItem("token")}
-      <div>
-        <button onClick={getMediaList}>getMedia</button>
-      </div>
 
-      <pre>{JSON.stringify(res, null, 2)}</pre> */}
       {isLoggedIn ? (
         <Container>
-          <>
-            <Home mediaList={mediaList} />
-            {/* tokenRef.current = <br /> <br />
-            {tokenRef.current}
-            <br />
-            <br />
-            <pre>{JSON.stringify(videos, null, 2)}</pre> */}
-          </>
+          <Home mediaList={mediaList} />
         </Container>
       ) : (
         <SplashScreen loginFailMassage={loginFailMassage} />

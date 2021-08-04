@@ -1,16 +1,30 @@
 import React from "react";
-import { Box } from "@material-ui/core";
+import { Box, Typography } from "@material-ui/core";
 
 interface Props {
   loginFailMassage: string;
 }
 const SplashScreen = (props: Props) => {
   return (
-    <Box sx={{ width: "100%", height: "100vh", display: "flex" }}>
+    <Box sx={{ width: "100%", height: "100vh" }}>
+      <Typography variant="h4" gutterBottom component="h1" align="center">
+        Splash screen
+      </Typography>
       {props.loginFailMassage ? (
-        <p>{props.loginFailMassage}</p>
+        <>
+          <Typography variant="body1" gutterBottom align="center">
+            {props.loginFailMassage}
+          </Typography>
+          <Typography variant="body1" gutterBottom align="center">
+            I will display fake data!!!
+          </Typography>
+        </>
       ) : (
-        <p>Trying to log in!</p>
+        <>
+          <Typography variant="body1" gutterBottom align="center">
+            Trying to log in!
+          </Typography>
+        </>
       )}
     </Box>
   );
