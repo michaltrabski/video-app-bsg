@@ -7,7 +7,7 @@ import Home, { MediaListObj } from "./components/Home";
 import axios from "axios";
 
 const ENDPOINT = "https://thebetter.bsgroup.eu/";
-const SIGN_IN_ENDPOINT = ENDPOINT + "Authorization/SignIn";
+const SIGN_IN_ENDPOINT = ENDPOINT + "Authorization/SignInC";
 const GET_MEDIA_LIST_ENDPOINT = ENDPOINT + "Media/GetMediaList";
 
 function App() {
@@ -32,15 +32,18 @@ function App() {
         tokenRef.current = Token;
         setIsLoggedIn(true);
         setLoginFailMassage("");
+        console.log(1);
       })
       .catch((err) => {
         setIsLoggedIn(false);
         setLoginFailMassage(err.message);
+        console.log(2);
 
         // since loggin on production doens not work due to cors policy I will diplay my mediaListFakeApi
         timeout = setTimeout(() => {
           setIsLoggedIn(true);
           setLoginFailMassage("");
+          console.log(3);
         }, 2000);
       });
 
@@ -49,7 +52,8 @@ function App() {
 
   // getMediaList
   useEffect(() => {
-    if (!tokenRef.current) return;
+    // Since there is no token on production I anyway want this call to load fake data.
+    // if (!tokenRef.current) return;
 
     axios
       .post<MediaListObj>(GET_MEDIA_LIST_ENDPOINT, {
@@ -68,12 +72,13 @@ function App() {
         },
       })
       .then((res) => {
+        console.log(4);
         setMediaList(res.data);
       })
       .catch((err) => {
         // I always get 401 - that is why I use madiaListFakeAPi to go further with task
         // There was no problem with request in postman and this is where I get data to hartcode in data/mediaList.json
-        console.log(err);
+        console.log(5);
         setMediaList(mediaListFakeApi);
       });
   }, [isLoggedIn]);
@@ -81,7 +86,6 @@ function App() {
   return (
     <>
       <CssBaseline />
-
       {isLoggedIn ? (
         <Container>{mediaList && <Home mediaList={mediaList} />}</Container>
       ) : (
